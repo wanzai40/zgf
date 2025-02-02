@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>员工点餐系统 - 汤馆</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <style>
+        /* 基础样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        /* 主容器布局 */
+        .menu-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 分类模块样式 */
+        .category {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .category:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 分类标题 */
+        .category-header {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            padding: 15px 20px;
+            color: white;
+        }
+
+        .category-header h3 {
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 菜品项样式 */
+        .item-list {
+            padding: 15px 20px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item:hover {
+            background: #f8f9fa;
+        }
+
+        .item-price {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        /* 不同分类配色方案 */
+        .category:nth-child(2) .category-header {
+            background: linear-gradient(135deg, #4ecdc4, #45b7af);
+        }
+
+        .category:nth-child(3) .category-header {
+            background: linear-gradient(135deg, #ffe66d, #ffd700);
+        }
+
+        .category:nth-child(4) .category-header {
+            background: linear-gradient(135deg, #6c5ce7, #5b4bc4);
+        }
+
+        /* 订单样式 */
+/* 订单区块美化样式 */
+.order-section {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 25px auto;
+    padding: 20px;
+    max-width: 800px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 15px;
+}
+
+.order-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.order-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.order-items {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.order-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: center;
+    padding: 12px 15px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.order-item:hover {
+    transform: translateX(5px);
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.item-name {
+    font-weight: 500;
+    color: #34495e;
+}
+
+.item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quantity-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quantity-btn:hover {
+    background: #d0d0d0;
+}
+
+.item-price {
+    text-align: right;
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.order-footer {
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+    margin-top: 15px;
+}
+
+.total-box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 15px;
+}
+
+.total-label {
+    font-size: 1.1em;
+    color: #7f8c8d;
+}
+
+.total-price {
+    font-size: 1.8em;
+    color: #27ae60;
+    font-weight: 700;
+}
+
+/* 按钮样式 */
+.btn-submit {
+    background: #27ae60;
+    color: white;
+    padding: 8px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-submit:hover {
+    background: #219a52;
+    transform: translateY(-1px);
+}
+
+.btn-clear {
+    background: #e74c3c;
+    color: white;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .menu-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center; margin-bottom: 30px;">汤馆点餐系统</h2>
+    
+    <div class="menu-section">
+        <!-- 锅盔汤类 -->
+        <div class="category">
+            <div class="category-header">
+                <h3>🥟 锅盔汤类</h3>
+            </div>
+            <div class="item-list">
+                <div class="item" onclick="addItem('腰花锅盔汤')">
+                    <span>腰花锅盔汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('三鲜锅盔汤')">
+                    <span>三鲜锅盔汤</span>
+                    <span class="item-price">¥40</span>
+                </div>
+                <div class="item" onclick="addItem('才鱼锅盔汤')">
+                    <span>才鱼锅盔汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('瘦肉腰花锅盔汤')">
+                    <span>瘦肉腰花锅盔汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('猪肝腰花锅盔汤')">
+                    <span>猪肝腰花锅盔汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('瘦肉锅盔汤')">
+                    <span>瘦肉锅盔汤</span>
+                    <span class="item-price">¥18</span>
+                </div>
+                <div class="item" onclick="addItem('猪肝锅盔汤')">
+                    <span>猪肝锅盔汤</span>
+                    <span class="item-price">¥18</span>
+                </div>
+                <div class="item" onclick="addItem('酸肉锅盔汤')">
+                    <span>酸肉锅盔汤</span>
+                    <span class="item-price">¥18</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 纯汤类 -->
+        <div class="category">
+            <div class="category-header">
+                <h3>🍲 纯汤类</h3>
+            </div>
+            <div class="item-list">
+                <div class="item" onclick="addItem('腰花汤')">
+                    <span>腰花汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('三鲜汤')">
+                    <span>三鲜汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('才鱼汤')">
+                    <span>才鱼汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('瘦肉腰花汤')">
+                    <span>瘦肉腰花汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('猪肝腰花汤')">
+                    <span>猪肝腰花汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('瘦肉汤')">
+                    <span>瘦肉汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+                <div class="item" onclick="addItem('猪肝汤')">
+                    <span>猪肝汤</span>
+                    <span class="item-price">¥28</span>
+                </div>
+              
+            </div>
+        </div>
+
+        <!-- 宰面类 -->
+        <div class="category">
+            <div class="category-header">
+                <h3>🍜 荤面类</h3>
+            </div>
+            <div class="item-list">
+                <div class="item" onclick="addItem('牛肉面（粉）')">
+                    <span>牛肉面（粉）</span>
+                    <span class="item-price">¥18</span>
+                </div>
+                <div class="item" onclick="addItem('三鲜面（粉）')">
+                    <span>三鲜面（粉）</span>
+                    <span class="item-price">¥15</span>
+                </div>
+                <div class="item" onclick="addItem('才鱼面（粉）')">
+                    <span>才鱼面（粉）</span>
+                    <span class="item-price">¥18</span>
+                </div>
+                <div class="item" onclick="addItem('香菇肉丝面')">
+                    <span>香菇肉丝面</span>
+                    <span class="item-price">¥13</span>
+                </div>
+                <div class="item" onclick="addItem('青椒肉丝面')">
+                    <span>青椒肉丝面</span>
+                    <span class="item-price">¥13</span>
+                </div>
+                <div class="item" onclick="addItem('雪菜肉丝面')">
+                    <span>雪菜肉丝面</span>
+                    <span class="item-price">¥18</span>
+                </div>
+                <div class="item" onclick="addItem('榨菜肉丝面')">
+                    <span>榨菜肉丝面</span>
+                    <span class="item-price">¥13</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 炒面类 -->
+        <div class="category">
+            <div class="category-header">
+                <h3>🔥 炒面类</h3>
+            </div>
+            <div class="item-list">
+                <div class="item" onclick="addItem('瘦肉鸡蛋炒面')">
+                    <span>瘦肉鸡蛋炒面</span>
+                    <span class="item-price">¥13</span>
+                </div>
+                <div class="item" onclick="addItem('瘦肉鸡蛋炒粉')">
+                    <span>瘦肉鸡蛋炒粉</span>
+                    <span class="item-price">¥13</span>
+                </div>
+                <div class="item" onclick="addItem('瘦肉鸡蛋炒饭')">
+                    <span>瘦肉鸡蛋炒饭</span>
+                    <span class="item-price">¥13</span>
+                </div>
+                <div class="item" onclick="addItem('鸡蛋炒面')">
+                    <span>鸡蛋炒面</span>
+                    <span class="item-price">¥10</span>
+                </div>
+                <div class="item" onclick="addItem('鸡蛋炒粉')">
+                    <span>鸡蛋炒粉</span>
+                    <span class="item-price">¥10</span>
+                </div>
+                <div class="item" onclick="addItem('鸡蛋炒饭')">
+                    <span>鸡蛋炒饭</span>
+                    <span class="item-price">¥10</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- 修改订单区块HTML结构 -->
+<div class="order-section">
+    <div class="order-header">
+        <h3>当前订单</h3>
+        <div class="order-controls">
+            
+            <button class="btn-clear" onclick="clearOrder()">清空订单</button>
+            <button class="btn-submit" onclick="submitOrder()">提交厨房</button>
+            <div id="myModal" class="modal">
+              <div class="modal-content">
+                         <p id="message">订单已提交厨房！</p>
+                           <p id="countdown">5秒后自动关闭</p>
+              </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="order-items" id="orderItems">
+        <!-- 订单项由JavaScript动态生成 -->
+    </div>
+    
+    <div class="order-footer">
+        <div class="total-box">
+            <span class="total-label">订单总计：</span>
+            <span class="total-price">¥<span id="total">0</span></span>
+        </div>
+    </div>
+</div>
+   
+
+    <div class="history-section">
+        <h3>历史订单</h3>
+        <div id="historyItems"></div>
+    </div>
+    
+    <br>
+    <hr>
+
+    <script>
+    
+    
+        const prices = {
+            // 锅盔汤类
+            '腰花锅盔汤': 28,
+            '三鲜锅盔汤': 40,
+            '才鱼锅盔汤': 28,
+            '瘦肉腰花锅盔汤': 28,
+            '猪肝腰花锅盔汤': 28,
+            '瘦肉锅盔汤': 18,
+            '猪肝锅盔汤': 18,
+            '酸肉锅盔汤': 18,
+            
+            // 纯汤类
+            '腰花汤': 28,
+            '三鲜汤': 28,
+            '才鱼汤': 28,
+            '瘦肉腰花汤': 28,
+            '猪肝腰花汤': 28,
+            '瘦肉汤': 28,
+            '猪肝汤': 28,
+            '酸肉汤': 28,
+            
+            // 宰面类
+            '牛肉面（粉）': 18,
+            '三鲜面（粉）': 15,
+            '才鱼面（粉）': 18,
+            '香菇肉丝面': 13,
+            '青椒肉丝面': 13,
+            '雪菜肉丝面': 18,
+            '榨菜肉丝面': 13,
+            '酸肉面': 13,
+            '炸酱面': 10,
+            '热干面': 17,
+            '凉面': 6,
+            '汤面（粉）': 0,
+            
+            // 炒面类
+            '瘦肉鸡蛋炒面': 13,
+            '瘦肉鸡蛋炒粉': 13,
+            '瘦肉鸡蛋炒饭': 13,
+            '鸡蛋炒面': 10,
+            '鸡蛋炒粉': 10,
+            '鸡蛋炒饭': 10
+        };
+
+        let order = JSON.parse(localStorage.getItem('order')) || {};
+        let history = JSON.parse(localStorage.getItem('history')) || [];
+
+        function addItem(itemName) {
+            order[itemName] = (order[itemName] || 0) + 1;
+            updateOrderDisplay();
+            saveData();
+        }
+        
+        function showModal() {
+            const modal = document.getElementById('myModal');
+            const countdownElement = document.getElementById('countdown');
+            let countdown = 5;
+
+            modal.style.display = 'block';
+
+            const interval = setInterval(function () {
+                countdown--;
+                countdownElement.textContent = `${countdown}秒后自动关闭`;
+
+                if (countdown === 0) {
+                    clearInterval(interval);
+                    modal.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+// 修改updateOrderDisplay函数
+function updateOrderDisplay() {
+    const container = document.getElementById('orderItems');
+    let html = '';
+    let total = 0;
+
+    for (const [item, quantity] of Object.entries(order)) {
+        const price = prices[item];
+        total += price * quantity;
+        html += `
+            <div class="order-item">
+                <div class="item-name">${item}</div>
+                <div class="item-quantity">
+                    <button class="quantity-btn" onclick="changeQuantity('${item}', -1)">-</button>
+                    <span>×${quantity}</span>
+                    <button class="quantity-btn" onclick="changeQuantity('${item}', 1)">+</button>
+                </div>
+                <div class="item-price">
+                    ¥${price * quantity}
+                    <button class="quantity-btn" onclick="removeItem('${item}')" 
+                            style="margin-left: 15px; background: #ff4757;">×</button>
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html || '<div style="text-align: center; color: #95a5a6; padding: 20px;">尚未添加任何菜品</div>';
+    document.getElementById('total').textContent = total;
+}
+
+        function updateHistoryDisplay() {
+            const container = document.getElementById('historyItems');
+            container.innerHTML = history.map((record, index) => {
+                // 计算订单总价
+                let total = 0;
+                for (const [item, qty] of Object.entries(record.items)) {
+                    total += prices[item] * qty;
+                }
+
+                return `
+                <hr>
+                <div class="history-item">
+                    <div class="history-info">
+                        <div>
+                            <div class="timestamp">${new Date(record.timestamp).toLocaleString()}</div>
+                            <br>
+                            ${Object.entries(record.items).map(([item, qty]) => 
+                                `${item} ×${qty} (¥${prices[item] * qty})`
+                            ).join(', ')}
+                        </div>
+                        <br>
+                        <div>
+                            <span class="history-total">¥${total}</span>
+                            <button onclick="deleteHistory(${index})" style="background: #ff9800;">完成</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).reverse().join('') || '<div>暂无待处理订单</div>';
+        }
+
+        function changeQuantity(item, delta) {
+            const newQty = (order[item] || 0) + delta;
+            newQty > 0 ? order[item] = newQty : delete order[item];
+            updateOrderDisplay();
+            saveData();
+        }
+
+        function removeItem(item) {
+            delete order[item];
+            updateOrderDisplay();
+            saveData();
+        }
+
+        function clearOrder() {
+            order = {};
+            updateOrderDisplay();
+            saveData();
+        }
+
+        function submitOrder() {
+            if (Object.keys(order).length === 0) return alert('请先选择菜品！');
+            
+            history.push({
+                timestamp: Date.now(),
+                items: {...order}
+            });
+            
+            order = {};
+            saveData();
+            updateOrderDisplay();
+            alert('订单已提交厨房！');
+        }
+
+        function deleteHistory(index) {
+            history.splice(index, 1);
+            saveData();
+            updateHistoryDisplay();
+        }
+
+        function saveData() {
+            localStorage.setItem('order', JSON.stringify(order));
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        // 初始化
+        updateOrderDisplay();
+    </script>
+    
+    <script>
+    updateHistoryDisplay()
+    
+// 在顶部添加配置参数
+const pushConfig = {
+  wxPusher: {
+    enable: true,  // 设为false则禁用
+    appToken: "AT_9A7RTsLNRhQs5aOFQrXqe9KPxT78VdRO",  // 替换为实际值
+    uid: "UID_3kB6Jdlk02vtJj5FhS2wG1GbjNyx"       // 替换为厨师UID
+  },
+  pushPlus: {
+    enable: false,  // 设为true启用
+    token: "xxxxxxxxxxxxxxxxxxxx"         // 替换为实际值
+  }
+};
+
+// 修改submitOrder函数
+async function submitOrder() {
+  if (Object.keys(order).length === 0) return alert('请先选择菜品！');
+  
+  try {
+    // 构建消息内容
+    const orderList = Object.entries(order)
+      .map(([item, qty]) => `${item} ×${qty}`)
+      .join('\n');
+    const total = document.getElementById('total').textContent;
+    const msg = `\n${orderList}\n----------------\n总价：¥${total}`;
+
+    // 双通道推送
+    const promises = [];
+    if (pushConfig.wxPusher.enable) {
+      promises.push(sendWxPusher(msg));
+    }
+    if (pushConfig.pushPlus.enable) {
+      promises.push(sendPushPlus(msg));
+    }
+    
+    showModal()
+    history.push({
+      timestamp: Date.now(),
+      items: {...order}
+    });
+
+    // 等待所有推送完成
+    await Promise.all(promises);
+    
+    updateHistoryDisplay()
+    clearOrder();
+  } catch (error) {
+    console.error('推送失败:', error);
+    alert('订单提交失败，请联系管理员');
+  }
+}
+
+// WxPusher推送方法
+async function sendWxPusher(content) {
+  const response = await fetch('https://wxpusher.zjiecode.com/api/send/message', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      appToken: pushConfig.wxPusher.appToken,
+      content: content,
+      summary: content,
+      contentType: 3,
+      uids: [pushConfig.wxPusher.uid]
+    })
+  });
+  const result = await response.json();
+  if (result.code !== 1000) throw new Error(result.msg);
+}
+
+// PushPlus推送方法
+async function sendPushPlus(content) {
+  const response = await fetch('https://www.pushplus.plus/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      token: pushConfig.pushPlus.token,
+      title: "汤馆新订单",
+      content: content,
+      template: "txt"
+    })
+  });
+  const result = await response.json();
+  if (result.code !== 200) throw new Error(result.msg);
+}
+
+</script>
+</body>
+</html>
